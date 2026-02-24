@@ -6,16 +6,17 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CtosDecryptionService {
 
     private final CtosCryptoService cryptoService;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final CtosAPICryptoService apiCryptoService;
 
-    public CtosDecryptionService(CtosCryptoService cryptoService) {
-        this.cryptoService = cryptoService;
-    }
-
+   
     /**
      * Decrypts the encrypted CTOS response
      * 
@@ -30,6 +31,20 @@ public class CtosDecryptionService {
 
         // Decrypt the "data" field
         String decryptedJson = cryptoService.decrypt(encryptedResponse.getData().toString());
+
+        // Convert JSON string to Map
+        Map<String, Object> decryptedMap = mapper.readValue(decryptedJson, Map.class);
+
+        return decryptedMap;
+    }
+    
+    public Map<String, Object> decryptAPIResponse(CtosEncryptedResponse encryptedResponse) throws Exception {
+        if (encryptedResponse == null || encryptedResponse.getData() == null) {
+            throw new IllegalArgumentException("Encrypted response or data is null");
+        }
+
+        // Decrypt the "data" field
+        String decryptedJson = apiCryptoService.decrypt(encryptedResponse.getData().toString());
 
         // Convert JSON string to Map
         Map<String, Object> decryptedMap = mapper.readValue(decryptedJson, Map.class);

@@ -25,6 +25,7 @@ public class CtosService {
     private final RestTemplate restTemplate;
     private final CtosCryptoService cryptoService;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final CtosDecryptionService decryptionService;
 
     @Value("${ctos.url}")
     private String baseUrl;
@@ -89,7 +90,7 @@ public class CtosService {
         }
 
         // Decrypt response
-        Map<String, Object> decryptedData = new CtosDecryptionService(cryptoService)
+        Map<String, Object> decryptedData = decryptionService
                 .decryptResponse(response.getBody());
 
         // Now you can return the decrypted data instead of raw response
@@ -97,4 +98,5 @@ public class CtosService {
 
        
     }
+    
 }
